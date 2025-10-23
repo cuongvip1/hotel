@@ -19,5 +19,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Seed demo tenant data (phòng, khách thuê, hoá đơn)
+        $this->call(\Database\Seeders\TenantDemoSeeder::class);
     }
 }

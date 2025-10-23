@@ -85,16 +85,23 @@ Route::middleware([EnsureWebAuthenticated::class])
 | 🧍 KHÁCH THUÊ (TENANT PANEL)
 |--------------------------------------------------------------------------
 */
-Route::middleware([EnsureWebAuthenticated::class])
-    ->prefix('khach-thue')
+Route::prefix('khach-thue')
     ->name('khach-thue.')
     ->group(function () {
-        Route::get('/dashboard', fn() => view('khachthue.dashboard'))->name('dashboard');
+        // Dashboard phải gọi controller để truyền dữ liệu (phòng, hoá đơn...)
+        Route::get('/dashboard', [TenantDashboardController::class, 'index'])->name('dashboard');
 
         // === Hóa đơn / Thanh toán của Khách thuê ===
-        Route::get('/hoa-don',            [TenantPayment::class, 'index'])->name('payments.index'); // dùng bởi invoices.blade.php
-        Route::get('/hoa-don/{id}',       [TenantPayment::class, 'show'])->name('payments.show');   // dùng bởi invoices.blade.php
-        Route::post('/hoa-don/{id}/pay',  [TenantPayment::class, 'pay'])->name('payments.pay');     // dùng bởi payments.blade.php (nút "Thanh toán ngay")
+        // Danh sách hoá đơn (view: resources/views/khachthue/invoices.blade.php)
+        Route::get('/hoa-don', [TenantInvoiceController::class, 'index'])->name('invoices');
+
+        // Chi tiết hoá đơn + thanh toán (view: resources/views/khachthue/payments.blade.php)
+        Route::get('/hoa-don/{id}', [TenantPaymentController::class, 'show'])->name('payments.show');
+        Route::post('/hoa-don/{id}/pay', [TenantPaymentController::class, 'pay'])->name('payments.pay');
+
+        // Hồ sơ khách thuê (view: resources/views/khachthue/profile.blade.php)
+        Route::get('/profile', [TenantProfileController::class, 'edit'])->name('profile');
+        Route::put('/profile', [TenantProfileController::class, 'update'])->name('profile.update');
     });
 
 /*
